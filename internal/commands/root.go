@@ -13,6 +13,9 @@ var rootCmd = &cobra.Command{
 	Long: `A CLI tool that helps you create enriched Markdown notes for your 
 	Obsidian vault from articles you read. It process text and generates 
 	structured notes with summaries, key takeaways, and additional information.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		cmd.Help()
+	},
 }
 
 func Execute() {

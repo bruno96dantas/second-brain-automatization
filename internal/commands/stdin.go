@@ -40,10 +40,15 @@ func readFromStdin() (string, error) {
 		return "", err
 	}
 
-	if (stat.Mode() & os.ModeCharDevice) != 0 {
-		return "", nil // No data available
+	if (stat.Mode() & os.ModeCharDevice) == 0 {
+		return readPipeData()
 	}
 
+	fmt.Println("Enter or paste your text: ")
+	return readInteractiveInput()
+}
+
+func readPipeData() (string, error) {
 	reader := bufio.NewReader(os.Stdin)
 	var builder strings.Builder
 
@@ -52,12 +57,31 @@ func readFromStdin() (string, error) {
 		if err != nil && err != io.EOF {
 			return "", err
 		}
-
+		if err == io.EOF {
+			break
+		}
 		builder.WriteString(line)
 
 		if err == io.EOF {
 			break
 		}
+	}
+
+	return builder.String(), nil
+}
+
+func readInteractiveInput() (string, error) {
+	scanner := bufio.NewScanner(os.Stdin)
+	var builder strings.Builder
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		builder.WriteString(line)
+		builder.WriteString("\n")
+	}
+
+	if err := scanner.Err(); err != nil {
+		return "", err
 	}
 
 	return builder.String(), nil
